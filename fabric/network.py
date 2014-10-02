@@ -531,17 +531,12 @@ def connect(user, host, port, cache, seek_gateway=True):
             password = prompt_for_password(text)
             # Update env.password, env.passwords if empty
             set_password(user, host, port, password)
-        # Ctrl-D / Ctrl-C for exit
-        except (EOFError, TypeError):
-            # Print a newline (in case user was sitting at prompt)
-            print('')
-            sys.exit(0)
         # Handle DNS error / name lookup failure
         except socket.gaierror, e:
             raise NetworkError('Name lookup failed for %s' % host, e)
         # Handle timeouts and retries, including generic errors
         # NOTE: In 2.6, socket.error subclasses IOError
-        except socket.error, e:
+        except (EOFError, TypeError, socket.error), e:
             not_timeout = type(e) is not socket.timeout
             giving_up = _tried_enough(tries)
             # Baseline error msg for when debug is off
